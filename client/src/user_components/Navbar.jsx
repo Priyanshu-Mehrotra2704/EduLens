@@ -1,5 +1,4 @@
 import React from 'react'
-import myimage from '../assets/edulens_logo.png'
 
 const Navbar = () => {
   return (
