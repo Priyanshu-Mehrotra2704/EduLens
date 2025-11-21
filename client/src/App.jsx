@@ -10,8 +10,8 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Navigate to = "/login"/>} />
-        <Route path="/dashboard" element={<Dashboard1 />} />
-        <Route path="/admin_dashboard" element={<Dashboard2 />} />
+        <Route path="/dashboard" element={<Dashboard2 />} />
+        <Route path="/admin_dashboard" element={<Dashboard1 />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         

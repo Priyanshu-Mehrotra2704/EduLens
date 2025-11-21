@@ -7,7 +7,7 @@ const Sidebar = () => {
     return (
     <div
       className={`h-screen text-black transition-all duration-300
-      ${open ? "w-64" : "w-16"} border-r border-gray-700 bg-[#0fc6b4]`}
+      ${open ? "w-64" : "w-16"} border-r border-gray-700 bg-[#0fc6b4] sticky top-0`}
     >
       {/* Sidebar Header */}
       <div className="flex items-center justify-between ">
