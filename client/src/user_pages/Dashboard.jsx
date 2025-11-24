@@ -1,13 +1,12 @@
 import React from 'react'
 import Navbar from '../user_components/Navbar'
 import Sidebar from '../user_components/Sidebar.jsx'
-import { LineChart, Line,  ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import Performance_score from '../user_components/Dashbord_comp/Performance_score.jsx'
+import Weak_areas from '../user_components/Dashbord_comp/Weak_areas.jsx'
+import AI_suggestions from '../user_components/Dashbord_comp/AI_suggestions.jsx'
+import Subjects_marks from '../user_components/Dashbord_comp/Subjects_marks.jsx'
 const Dashboard = () => {
-  const data = [
-    { name: 'Jan', score: 75 },
-    { name: 'Feb', score: 80 },
-    { name: 'Mar', score: 78 },
-];
+
   return (
     <div>
         <div className="flex">
@@ -16,32 +15,12 @@ const Dashboard = () => {
                 <Navbar />
                 <div className='p-4 mt-4 flex flex-row justify-around flex-wrap'>
                   {/* Main content for user dashboard goes here */}
-                  <div className='mb-2 border rounded-lg w-80 h-60 flex flex-col items-center justify-center bg-white shadow-[5px_5px_10px_rgba(0,0,0,0.6)]'>
-                    <h1 className='text-xl font-semibold mt-2 font-tasa-orbiter text-[#207dff]'>Performance Score</h1>
-                    <div className="w-full h-full mt-8 ml-8">
-                      <ResponsiveContainer width="80%" height="100%" className="outline-none">
-                        <LineChart data={data}>
-                          <XAxis dataKey="name" tickLine={false}/>
-                          <Line
-                            type="monotone"
-                            dataKey="score"
-                            stroke="red"
-                            strokeWidth={1.5}
-                            dot={{ r: 3 }}
-                            label={{ position: "bottom", fill: "#207dff", fontSize: 12 }}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                  </div>
-                  <div className='mb-2 border rounded-lg w-80 h-60 flex flex-col items-center justify-center bg-white shadow-[5px_5px_10px_rgba(0,0,0,0.6)]'>
-                    <h1 className='text-xl font-semibold mb-4'>Weak Areas</h1>
-                  </div>
-                  <div className='border rounded-lg w-80 h-60 flex flex-col items-center justify-center bg-white shadow-[5px_5px_10px_rgba(0,0,0,0.6)]'>
-                    <h1 className='text-xl font-semibold mb-4'>AI Suggestions</h1>
-                  </div>
+                    <div><Performance_score /></div>
+                    <div><Weak_areas /></div>
+                  
+                  <div><AI_suggestions /></div>
                 </div>
+                <div className='m-3'><Subjects_marks /></div>
             </div>
         </div>
     </div>
