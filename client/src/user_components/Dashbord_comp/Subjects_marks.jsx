@@ -18,20 +18,20 @@ const Subjects_marks = () => {
                 Subject-Wise Analysis
             </h1>
 
-            <div className="w-full h-[300px] mt-8 mr-4">
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="w-full lg:h-[350px] h-[200px] mt-8 mr-4">
+                <ResponsiveContainer width="100%" height="100%" className="outline-none">
                     <BarChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="name" tickLine={false} />
-                        <YAxis />
+                        <YAxis domain={[0, 100]} />
                         <Tooltip />
                         
                         <Bar 
                             dataKey="score" 
-                            fill="#207dff" 
+                            fill="rgba(0,191,255,1)" 
                             barSize={40} 
                             radius={[5, 5, 0, 0]} 
-                            label={{ position: "right", fill: "#0B2C59", fontSize: 12 }} 
+                            label={{ position: "right", fill: "red", fontSize: 14 }} 
                         />
                     </BarChart>
                 </ResponsiveContainer>
