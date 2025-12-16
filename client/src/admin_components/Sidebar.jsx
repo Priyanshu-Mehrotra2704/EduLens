@@ -1,7 +1,7 @@
 import { Home, Settings, ChevronLeft, ChevronRight, LayoutDashboard, FileText } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useLocation, Link } from 'react-router-dom'
-import myimage from '../assets/edulens_logo.png'
+import myimage from '../assets/edulens (2).png'
 
 const Sidebar = () => {
     const [open, setOpen] = useState(true);
@@ -33,7 +33,7 @@ const Sidebar = () => {
     return (
         <div
             className={`h-screen text-black transition-all duration-300
-            ${open ? "w-64" : "w-16"} border-r border-gray-700 bg-[#0fc6b4] sticky top-0`}
+            ${open ? "w-64" : "w-16"} border-r border-gray-700 bg-gradient-to-r from-[#207dff] to-[#0fc6b4] hover:shadow-xl sticky top-0`}
         >
             {/* Sidebar Header */}
             <div className="flex items-center justify-between ">

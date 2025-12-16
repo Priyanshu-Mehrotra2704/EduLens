@@ -44,6 +44,40 @@ def summarize_pdf():
 
     # 4. Return summary
     return jsonify({"summary": summary})
+@app.route("/quiz_from_pdf", methods=["POST"])
+def quiz_pdf():
+    # 1. Check if PDF uploaded
+    if "file" not in request.files:
+        return jsonify({"error": "Please upload a PDF file"}), 400
+
+    pdf = request.files["file"]
+
+    # 2. Extract text from PDF
+    text = pdf_to_text(pdf)
+
+    if not text.strip():
+        return jsonify({"error": "No readable text in PDF"}), 400
+
+    # 3. Ask OpenAI to summarize the text
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "user", "content": f"Generate 10-20 single-choice questions (MCQ) for a university exam based on the text below. "
+        f"Strictly follow this format for every question:\n\n"
+        f"1. Question text here?\n"
+        f"A) Option 1\n"
+        f"B) Option 2\n"
+        f"C) Option 3\n"
+        f"D) Option 4\n"
+        f"Answer:-: A) Option 1\n\n"
+        f"Text to use:\n{text}"}
+        ]
+    )
+
+    summary = response.choices[0].message.content
+
+    # 4. Return summary
+    return jsonify({"quiz": summary})
 
 
 if __name__ == "__main__":
