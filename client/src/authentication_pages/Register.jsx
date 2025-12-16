@@ -62,6 +62,7 @@ const Register = () => {
       const response = await fetch('https://edu-lens-ten.vercel.app/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: "include",
         body: JSON.stringify(dataToSend)
       });
 
