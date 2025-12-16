@@ -11,8 +11,13 @@ const port = process.env.PORT || 3000;
 
 app.use(cors({
   origin: "https://edu-lens-vxgv.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+
+// 🔥 REQUIRED FOR PREFLIGHT
+app.options('*', cors());
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -23,5 +28,4 @@ app.get('/', (req, res) => {
 
 app.use('/api', router);
 
-// 🔥 THIS LINE WAS MISSING
 module.exports = app;
