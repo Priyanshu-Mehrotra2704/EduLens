@@ -27,7 +27,7 @@ const Register = () => {
     intervalRef.current = setInterval(async () => {
       try {
         const res = await fetch(
-          `https://edu-lens-red.vercel.app/api/check-verification?email=${email}`
+          `http://localhost:3000/api/check-verification?email=${email}`
         );
         const data = await res.json();
 
@@ -59,7 +59,7 @@ const Register = () => {
     };
 
     try {
-      const response = await fetch('https://edu-lens-red.vercel.app/api/signup', {
+      const response = await fetch('http://localhost:3000/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend)
