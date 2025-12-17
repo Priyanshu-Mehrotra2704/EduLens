@@ -10,9 +10,14 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://edu-lens-vxgv.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+
+// 🔥 REQUIRED FOR PREFLIGHT
+app.options('*', cors());
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -23,7 +28,4 @@ app.get('/', (req, res) => {
 
 app.use('/api', router);
 
-// 🔥 THIS LINE WAS MISSING
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+module.exports = app;
