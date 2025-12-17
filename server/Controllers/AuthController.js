@@ -5,17 +5,9 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const ADMIN_SECRET = "A1B2C3987654321";
 
-// ✅ BASE URL (works locally + on Vercel)
-const BASE_URL =
-  process.env.BASE_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000');
-
-// ================= MAIL TRANSPORT =================
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
@@ -24,9 +16,9 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// ================= SIGNUP =================
+/* ================= SIGNUP ================= */
 const signup = async (req, res) => {
-  const { name, email, password, adminCode } = req.body;
+  const { name, email, password, adminCode, role } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -40,36 +32,34 @@ const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    // ✅ SAFE admin logic
-    const role = adminCode === ADMIN_SECRET ? 'admin' : 'user';
+    // ✅ FIXED ADMIN ROLE LOGIC (your current approach)
+    const finalRole =
+      adminCode === ADMIN_SECRET || role === 'admin'
+        ? 'admin'
+        : 'user';
 
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
-      role,
+      role: finalRole,
       verificationToken,
       verified: false
     });
 
     await newUser.save();
 
-    // ✅ SAFE EMAIL SEND (NO 500 EVEN IF EMAIL FAILS)
-    try {
-      await transporter.sendMail({
-        from: process.env.EMAIL,
-        to: email,
-        subject: 'Email Verification',
-        html: `
-          <p>Please verify your email:</p>
-          <a href="${BASE_URL}/api/verify-email?token=${verificationToken}">
-            Verify Email
-          </a>
-        `
-      });
-    } catch (mailError) {
-      console.error('Email failed:', mailError.message);
-    }
+    await transporter.sendMail({
+      from: process.env.EMAIL,
+      to: email,
+      subject: 'Email Verification',
+      html: `
+        <p>Please verify your email by clicking the link below:</p>
+        <a href="http://localhost:3000/api/verify-email?token=${verificationToken}">
+          Verify Email
+        </a>
+      `
+    });
 
     res.status(201).json({
       success: true,
@@ -77,7 +67,7 @@ const signup = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error(error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -85,7 +75,7 @@ const signup = async (req, res) => {
   }
 };
 
-// ================= VERIFY EMAIL =================
+/* ================= VERIFY EMAIL ================= */
 const verifyEmail = async (req, res) => {
   const { token } = req.query;
 
@@ -115,7 +105,7 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-// ================= LOGIN =================
+/* ================= LOGIN ================= */
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -149,9 +139,10 @@ const login = async (req, res) => {
       { expiresIn: '1h' }
     );
 
+    // ✅ FIXED COOKIE
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       maxAge: 3600000
     });
@@ -171,7 +162,6 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Server error'
@@ -179,33 +169,7 @@ const login = async (req, res) => {
   }
 };
 
-// ================= CHECK VERIFICATION =================
-const checkVerification = async (req, res) => {
-  try {
-    const { email } = req.query;
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      verified: user.verified
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error checking email verification'
-    });
-  }
-};
-
-// ================= MIDDLEWARE =================
+/* ================= MIDDLEWARE ================= */
 const verifyToken = (req, res, next) => {
   const token = req.cookies?.token;
   if (!token) {
@@ -256,14 +220,29 @@ const logout = (req, res) => {
     message: 'Logout successful'
   });
 };
-
+const checkVerification = async (req, res) => {
+    try{
+    const {email} = req.query;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found', success: false });
+    }
+    if (user.verified) {
+      return res.status(200).json({ message: 'Email is already verified', success: true, verified: true });
+    }else{
+      return res.status(200).json({ message: 'Email is not verified', success: false, verified: false });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Error checking email verification', success: false });
+  }
+};
 module.exports = {
   signup,
   verifyEmail,
   login,
-  checkVerification,
   verifyToken,
+  checkVerification,
+  logout,
   isLoggedIn,
-  isAdmin,
-  logout
+  isAdmin
 };
