@@ -5,8 +5,10 @@ import Performance_score from '../user_components/Dashbord_comp/Performance_scor
 import Weak_areas from '../user_components/Dashbord_comp/Weak_areas.jsx'
 import AI_suggestions from '../user_components/Dashbord_comp/AI_suggestions.jsx'
 import Subjects_marks from '../user_components/Dashbord_comp/Subjects_marks.jsx'
-const Dashboard = () => {
+import AvailableQuizzes from '../user_components/Dashbord_comp/AvailableQuizzes.jsx'
+import AI_Features from '../user_components/Dashbord_comp/AI_Features.jsx'
 
+const Dashboard = () => {
   return (
     <div>
         <div className="flex">
@@ -17,10 +19,11 @@ const Dashboard = () => {
                   {/* Main content for user dashboard goes here */}
                     <div><Performance_score /></div>
                     <div><Weak_areas /></div>
-                  
-                  <div><AI_suggestions /></div>
+                    <div><AI_suggestions /></div>
                 </div>
+                <div className='m-3'><AI_Features /></div>
                 <div className='m-3'><Subjects_marks /></div>
+                <div className='m-3'><AvailableQuizzes /></div>
             </div>
         </div>
     </div>

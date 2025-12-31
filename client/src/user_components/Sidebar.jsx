@@ -1,4 +1,4 @@
-import { Home, Settings, ChevronLeft, ChevronRight, LayoutDashboard, FileText, FileQuestion } from 'lucide-react'
+import { Home, Settings, ChevronLeft, ChevronRight, LayoutDashboard, FileText, FileQuestion, BookOpen, Sparkles, MessageCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import myimage from '../assets/edulens (2).png'
@@ -26,6 +26,10 @@ const Sidebar = () => {
 
     const menuItems = [
         { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+        { name: "Available Quizzes", icon: BookOpen, path: "/quizzes" },
+        { name: "Study Notes", icon: FileText, path: "/notes" },
+        { name: "AI Tools", icon: Sparkles, path: "/ai-tools" },
+        { name: "AI Study Buddy", icon: MessageCircle, path: "/ai-buddy" },
         { name: "Summerize", icon: FileText, path: "/summerize" },
         { name: "Quiz from Notes", icon: FileQuestion, path: "/notesquiz" },
         { name: "Settings", icon: Settings, path: "/settings" },

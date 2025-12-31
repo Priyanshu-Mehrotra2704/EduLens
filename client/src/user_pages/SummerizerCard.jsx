@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import Navbar from "../user_components/Navbar";
 import Sidebar from "../user_components/Sidebar.jsx";
-import Performance_score from "../user_components/Dashbord_comp/Performance_score.jsx";
-import Weak_areas from "../user_components/Dashbord_comp/Weak_areas.jsx";
-import AI_suggestions from "../user_components/Dashbord_comp/AI_suggestions.jsx";
-import Subjects_marks from "../user_components/Dashbord_comp/Subjects_marks.jsx";
+import { API_ENDPOINTS } from "../config";
+import { handleError, handleSuccess } from "../utils";
+import { ToastContainer } from "react-toastify";
 
 const Dashboard = () => {
   const [summary, setSummary] = useState("");
@@ -17,7 +16,7 @@ const Dashboard = () => {
       setSummary("");   // Clear old summary
 
       if (!file) {
-        alert("Please upload a PDF!");
+        handleError("Please upload a PDF!");
         setLoading(false);
         return;
       }
@@ -25,17 +24,27 @@ const Dashboard = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("http://127.0.0.1:5000/summarize_pdf", {
+      const response = await fetch(API_ENDPOINTS.ML.SUMMARIZE, {
         method: "POST",
         body: formData,
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to summarize PDF");
+      }
+
       const data = await response.json();
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       const formattedSummary = data.summary.replace(/\*\*(.*?)\*\*/g, '<br/><span class="font-bold text-[#fd1a01]">$1</span>');
       setSummary(formattedSummary);
+      handleSuccess("PDF summarized successfully!");
     } catch (error) {
       console.error("Error during summarization:", error);
-      alert("An error occurred while summarizing the PDF.");
+      handleError(error.message || "An error occurred while summarizing the PDF.");
     }
 
     setLoading(false); // STOP LOADER
@@ -60,7 +69,6 @@ const Dashboard = () => {
                 accept=".pdf"
                 onChange={(e) => {
                   setFile(e.target.files[0]);
-                  setErrorMsg(""); 
                 }}
                 className="block w-full text-sm text-gray-500
                   file:mr-4 file:py-3 file:px-4
@@ -101,6 +109,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

@@ -26,7 +26,6 @@ const Sidebar = () => {
 
     const menuItems = [
         { name: "Dashboard", icon: LayoutDashboard, path: "/admin_dashboard" },
-        { name: "Upload Marking", icon: FileText, path: "/upload-marking" },
         { name: "Settings", icon: Settings, path: "/settings" },
     ];
 

@@ -10,6 +10,9 @@ import {
   Play
 } from "lucide-react";
 import Sidebar1 from "../user_components/Sidebar.jsx";
+import { API_ENDPOINTS } from "../config";
+import { handleError, handleSuccess } from "../utils";
+import { ToastContainer } from "react-toastify";
 
 
 
@@ -72,7 +75,6 @@ const Quiz = () => {
   // Game States: 'idle' (upload), 'loading', 'playing', 'finished'
   const [gameState, setGameState] = useState('idle');
   const [file, setFile] = useState(null);
-  const [errorMsg, setErrorMsg] = useState("");
   
   // Gameplay Data
   const [questions, setQuestions] = useState([]);
@@ -86,10 +88,9 @@ const Quiz = () => {
   const handleStartGame = async () => {
     try {
       setGameState('loading');
-      setErrorMsg("");
 
       if (!file) {
-        setErrorMsg("Please upload a PDF to generate the quiz!");
+        handleError("Please upload a PDF to generate the quiz!");
         setGameState('idle');
         return;
       }
@@ -97,12 +98,15 @@ const Quiz = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("http://127.0.0.1:5000/quiz_from_pdf", {
+      const response = await fetch(API_ENDPOINTS.ML.QUIZ_FROM_PDF, {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Failed to fetch quiz");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to generate quiz");
+      }
 
       const data = await response.json();
       
@@ -125,7 +129,7 @@ const Quiz = () => {
 
     } catch (error) {
       console.error("Error starting game:", error);
-      setErrorMsg("Failed to generate quiz. Please try a different PDF.");
+      handleError(error.message || "Failed to generate quiz. Please try a different PDF.");
       setGameState('idle');
     }
   };
@@ -156,6 +160,8 @@ const Quiz = () => {
       setIsCorrect(null);
     } else {
       setGameState('finished');
+      // Note: PDF-generated quizzes are practice only and don't save to database
+      // Teacher-created quizzes should be taken from the student dashboard
     }
   };
 
@@ -191,7 +197,6 @@ const Quiz = () => {
             border-2 border-dashed border-gray-300 rounded-xl p-4 bg-gray-50 cursor-pointer mb-6"
         />
 
-        {errorMsg && <p className="text-red-500 font-bold mb-4 bg-red-50 p-3 rounded-lg">{errorMsg}</p>}
 
         <button
           onClick={handleStartGame}
@@ -362,6 +367,7 @@ const Quiz = () => {
           {gameState === 'finished' && renderFinished()}
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

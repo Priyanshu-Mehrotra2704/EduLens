@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key';
 const ADMIN_SECRET = "A1B2C3987654321";
+const TEACHER_SECRET = "TEACHER2024";
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -18,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 /* ================= SIGNUP ================= */
 const signup = async (req, res) => {
-  const { name, email, password, adminCode, role } = req.body;
+  const { name, email, password, adminCode, teacherCode, role } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -32,11 +33,21 @@ const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    // ✅ FIXED ADMIN ROLE LOGIC (your current approach)
-    const finalRole =
-      adminCode === ADMIN_SECRET || role === 'admin'
-        ? 'admin'
-        : 'user';
+    // Determine role based on codes or explicit role (all optional)
+    let finalRole = 'user'; // Default role
+    
+    // Check if admin code is provided and matches
+    if (adminCode && adminCode.trim() === ADMIN_SECRET) {
+      finalRole = 'admin';
+    }
+    // Check if teacher code is provided and matches (only if not admin)
+    else if (teacherCode && teacherCode.trim() === TEACHER_SECRET) {
+      finalRole = 'teacher';
+    }
+    // If explicit role is provided in request, use it (for admin override)
+    else if (role === 'admin' || role === 'teacher') {
+      finalRole = role;
+    }
 
     const newUser = new User({
       name,
@@ -49,15 +60,30 @@ const signup = async (req, res) => {
 
     await newUser.save();
 
+    // Use frontend URL for email verification link
+    const verificationUrl = `http://localhost:5173/verify-email?token=${verificationToken}`;
+    
     await transporter.sendMail({
       from: process.env.EMAIL,
       to: email,
-      subject: 'Email Verification',
+      subject: 'Email Verification - EduLens',
       html: `
-        <p>Please verify your email by clicking the link below:</p>
-        <a href="http://localhost:3000/api/verify-email?token=${verificationToken}">
-          Verify Email
-        </a>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #207dff;">Welcome to EduLens!</h2>
+          <p>Hello ${name},</p>
+          <p>Thank you for registering with EduLens. Please verify your email address by clicking the button below:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}" 
+               style="background-color: #207dff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+              Verify Email Address
+            </a>
+          </div>
+          <p>Or copy and paste this link into your browser:</p>
+          <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
+          <p style="color: #999; font-size: 12px; margin-top: 30px;">
+            If you didn't create an account with EduLens, please ignore this email.
+          </p>
+        </div>
       `
     });
 
@@ -79,28 +105,47 @@ const signup = async (req, res) => {
 const verifyEmail = async (req, res) => {
   const { token } = req.query;
 
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: 'Verification token is required'
+    });
+  }
+
   try {
     const user = await User.findOne({ verificationToken: token });
+    
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired token'
+        message: 'Invalid or expired verification token'
       });
     }
 
+    // Check if already verified
+    if (user.verified) {
+      return res.status(200).json({
+        success: true,
+        message: 'Email is already verified'
+      });
+    }
+
+    // Verify the user
     user.verified = true;
     user.verificationToken = undefined;
     await user.save();
 
     res.status(200).json({
       success: true,
-      message: 'Email verified successfully'
+      message: 'Email verified successfully',
+      email: user.email
     });
 
   } catch (error) {
+    console.error('Error verifying email:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'Server error while verifying email'
     });
   }
 };
@@ -203,10 +248,20 @@ const isLoggedIn = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  if (req.session?.user?.role !== 'admin') {
+  if (req.userRole !== 'admin') {
     return res.status(403).json({
       success: false,
-      message: 'Access denied'
+      message: 'Access denied. Admin role required.'
+    });
+  }
+  next();
+};
+
+const isAdminOrTeacher = (req, res, next) => {
+  if (req.userRole !== 'admin' && req.userRole !== 'teacher') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied. Teacher or Admin role required.'
     });
   }
   next();
@@ -244,5 +299,6 @@ module.exports = {
   checkVerification,
   logout,
   isLoggedIn,
-  isAdmin
+  isAdmin,
+  isAdminOrTeacher
 };

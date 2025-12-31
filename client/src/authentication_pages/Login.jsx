@@ -5,6 +5,7 @@ import { MailIcon, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { handleError, handleSuccess } from '../utils';
+import { API_ENDPOINTS } from '../config';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,8 +34,7 @@ const Login = () => {
     }
 
     try {
-      const url = `http://localhost:3000/api/login`;
-      const response = await fetch(url, {
+      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -51,6 +51,15 @@ const Login = () => {
         setTimeout(() => {
           navigate('/admin_dashboard');
           localStorage.setItem('name', data.name);
+          localStorage.setItem('role', data.role);
+        }, 1500);
+      }
+      else if (success && data.role === 'teacher') {
+        handleSuccess(message);
+        setTimeout(() => {
+          navigate('/teacher_dashboard');
+          localStorage.setItem('name', data.name);
+          localStorage.setItem('role', data.role);
         }, 1500);
       }
       else if (success) {
@@ -58,6 +67,7 @@ const Login = () => {
         setTimeout(() => {
           navigate('/dashboard');
           localStorage.setItem('name', data.name);
+          localStorage.setItem('role', data.role || 'user');
         }, 1500);
       } else {
         handleError(message);

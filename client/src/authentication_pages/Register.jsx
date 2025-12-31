@@ -4,6 +4,7 @@ import image2 from '../assets/edulens_logo1.png';
 import { User, MailIcon, Lock, UserCheckIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { handleError, handleSuccess } from '../utils';
+import { API_ENDPOINTS } from '../config';
 import { ToastContainer } from 'react-toastify';
 
 const Register = () => {
@@ -12,6 +13,7 @@ const Register = () => {
     email: '',
     password: '',
     adminCode: '',
+    teacherCode: '',
     role: 'user'
   });
 
@@ -27,7 +29,8 @@ const Register = () => {
     intervalRef.current = setInterval(async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/check-verification?email=${email}`
+          `${API_ENDPOINTS.AUTH.CHECK_VERIFICATION}?email=${email}`,
+          { credentials: 'include' }
         );
         const data = await res.json();
 
@@ -50,19 +53,25 @@ const Register = () => {
       return;
     }
 
+    // Only send codes if they have values (make them truly optional)
     const dataToSend = {
-      ...registerData,
-      role:
-        registerData.adminCode === 'A1B2C3987654321'
-          ? 'admin'
-          : 'user'
+      name: registerData.name,
+      email: registerData.email,
+      password: registerData.password
     };
 
+    // Only include codes if they are provided and not empty
+    if (registerData.adminCode && registerData.adminCode.trim()) {
+      dataToSend.adminCode = registerData.adminCode.trim();
+    }
+    if (registerData.teacherCode && registerData.teacherCode.trim()) {
+      dataToSend.teacherCode = registerData.teacherCode.trim();
+    }
+
     try {
-      const response = await fetch('http://localhost:3000/api/signup', {
+      const response = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(dataToSend)
       });
 
@@ -154,7 +163,7 @@ const Register = () => {
           </label>
 
           {/* ADMIN CODE */}
-          <label className='shadow-[5px_5px_10px_rgba(0,191,255,1)] border-b p-3 mb-6 flex items-center border-[#207dff] focus-within:border-blue-700 transition-colors'>
+          <label className='shadow-[5px_5px_10px_rgba(0,191,255,1)] border-b p-3 mb-4 flex items-center border-[#207dff] focus-within:border-blue-700 transition-colors'>
             <UserCheckIcon className='mr-3 text-[#207dff]' size={20} />
             <input 
               type="text"
@@ -162,6 +171,19 @@ const Register = () => {
               value={registerData.adminCode}
               onChange={handleChange}
               placeholder='Admin Code (Optional)'
+              className='outline-none w-full text-base placeholder-gray-400'
+            />
+          </label>
+
+          {/* TEACHER CODE */}
+          <label className='shadow-[5px_5px_10px_rgba(0,191,255,1)] border-b p-3 mb-6 flex items-center border-[#207dff] focus-within:border-blue-700 transition-colors'>
+            <UserCheckIcon className='mr-3 text-[#207dff]' size={20} />
+            <input 
+              type="text"
+              name="teacherCode"
+              value={registerData.teacherCode}
+              onChange={handleChange}
+              placeholder='Teacher Code (Optional)'
               className='outline-none w-full text-base placeholder-gray-400'
             />
           </label>

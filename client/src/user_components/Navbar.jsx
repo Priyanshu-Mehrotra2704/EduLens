@@ -1,16 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config';
 
 const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:3000/api/logout', {
+      await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
         method: 'POST',
         credentials: 'include', // IMPORTANT for cookies
       });
       localStorage.removeItem('name');
+      localStorage.removeItem('role');
       navigate('/login');
     } catch (err) {
       console.error('Logout failed', err);
