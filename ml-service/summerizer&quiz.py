@@ -8,7 +8,7 @@ import tempfile
 app = Flask(__name__)
 CORS(app)
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="API KEY")
 
 
 # Convert PDF → Text
