@@ -1,16 +1,40 @@
-# React + Vite
+# EduLens Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This directory contains the React frontend for EduLens. It's built with [Vite](https://vitejs.dev/) for fast development.
 
-Currently, two official plugins are available:
+## 📂 Folder Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **src/**: Source code
+  - **admin_components/** & **admin_pages/**: Components and pages specific to the Admin role.
+  - **teacher_components/** & **teacher_pages/**: Components and pages specific to the Teacher role.
+  - **user_components/** & **user_pages/**: Components and pages specific to the Student role.
+  - **authentication_pages/**: Login, Register, and VerifyEmail pages.
+  - **components/**: Shared components (like ProtectedRoute).
+  - **assets/**: Images, fonts, etc.
+  - **utils/**: Utility functions.
+  - **App.jsx**: The main component that handles routing.
+  - **main.jsx**: The entry point where the React app is mounted to the DOM.
 
-## React Compiler
+## 🚀 Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
 
-## Expanding the ESLint configuration
+2.  **Environment Variables**:
+    Create a `.env` file (or `.env.local`) in this directory if you need to override defaults.
+    - `VITE_API_URL`: The URL of the backend server (default might be hardcoded as `http://localhost:3000` or similar).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3.  **Run the Development Server**:
+    ```bash
+    npm run dev
+    ```
+    The app will usually open at `http://localhost:5173`.
+
+## 🛠️ Key Libraries
+
+- **React**: The UI library.
+- **React Router (react-router-dom)**: Handles navigation between pages (routes).
+- **Axios**: Used to make HTTP requests to the backend API.
+- **Tailwind CSS** (likely): For styling.

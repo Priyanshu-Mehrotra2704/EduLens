@@ -1,4 +1,5 @@
 import './App.css'
+// Import Pages
 import Dashboard1 from './admin_pages/Dashboard'
 import Dashboard2 from './user_pages/Dashboard'
 import TeacherDashboard from './teacher_pages/Dashboard'
@@ -15,18 +16,22 @@ import AIStudyBuddy from './user_pages/AIStudyBuddy'
 import Notes from './user_pages/Notes'
 import TeacherAITools from './teacher_pages/AITools'
 import ProtectedRoute from './components/ProtectedRoute'
-import {Navigate, Routes, Route } from 'react-router-dom'
+import { Navigate, Routes, Route } from 'react-router-dom'
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Navigate to = "/login"/>} />
+        {/* Public Routes - Accessible by anyone */}
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
-        
-        {/* Protected Routes */}
+
+        {/* Protected Routes - Only accessible by authenticated users */}
+        {/* The 'ProtectedRoute' component checks if the user is logged in */}
+
+        {/* Student Routes */}
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard2 />
@@ -39,6 +44,7 @@ function App() {
         } />
         <Route path="/notesquiz" element={
           <ProtectedRoute>
+            {/* This seems to be for creating/viewing a quiz from notes */}
             <Quiz />
           </ProtectedRoute>
         } />
@@ -67,11 +73,15 @@ function App() {
             <Notes />
           </ProtectedRoute>
         } />
+
+        {/* Admin Routes - Only for users with 'admin' role */}
         <Route path="/admin_dashboard" element={
           <ProtectedRoute requiredRole="admin">
             <Dashboard1 />
           </ProtectedRoute>
         } />
+
+        {/* Teacher Routes - Only for users with 'teacher' role */}
         <Route path="/teacher_dashboard" element={
           <ProtectedRoute requiredRole="teacher">
             <TeacherDashboard />

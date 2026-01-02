@@ -1,19 +1,23 @@
 const express = require('express')
-require('dotenv').config()
-require('./Models/db')
+require('dotenv').config() // Load environment variables from .env file
+require('./Models/db') // Connect to MongoDB database
 const cors = require('cors')
 const bodyparser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const path = require('path')
 const fs = require('fs')
+
+// Import Route handlers
 const authRouter = require('./Routes/authroutes')
 const teacherRouter = require('./Routes/teacherRoutes')
 const studentRouter = require('./Routes/studentRoutes')
 const adminRouter = require('./Routes/adminRoutes')
+
 const app = express()
 const port = process.env.PORT || 3000
 
 // Create uploads directory if it doesn't exist
+// This is used to store uploaded notes locally
 const uploadsDir = path.join(__dirname, 'uploads', 'notes')
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true })
@@ -23,7 +27,9 @@ app.get('/', (req, res) => res.send('Hello World!'))
 
 
 // CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
+// CORS (Cross-Origin Resource Sharing) allows the frontend (running on a different port)
+// to communicate with this backend.
+const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ["http://localhost:5173", "http://localhost:3000"];
 
@@ -37,15 +43,20 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true // Allow cookies to be sent with requests
 }))
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({ extended: true }))
-app.use(cookieParser())
 
-// Serve uploaded files
+// Middleware Setup
+app.use(bodyparser.json()) // Parse JSON bodies (as sent by API clients)
+app.use(bodyparser.urlencoded({ extended: true })) // Parse URL-encoded bodies
+app.use(cookieParser()) // Parse Cookie header and populate req.cookies
+
+// Serve uploaded files statically
+// This means files in 'server/uploads' can be accessed via http://server/uploads/...
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
+// API Routes
+// All routes starting with /api/auth go to authRouter, etc.
 app.use('/api/auth', authRouter)
 app.use('/api/teacher', teacherRouter)
 app.use('/api/student', studentRouter)

@@ -3,3 +3,6 @@ flask-cors
 pypdf
 openai
 python-pptx
+pandas
+scikit-learn
+joblib
