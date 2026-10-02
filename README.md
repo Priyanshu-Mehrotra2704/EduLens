@@ -149,11 +149,7 @@ EduLens/
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- **Node.js** (v18 or higher)
-- **Python** (v3.8 or higher)
-- **MongoDB** (local or cloud instance)
-- **OpenAI API Key** (for AI features)
+
 
 ### Installation
 
