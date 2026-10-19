@@ -94,7 +94,6 @@ EduLens leverages artificial intelligence to transform traditional learning expe
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 19** - UI library
 - **Vite** - Build tool and dev server
 - **Tailwind CSS** - Styling framework
 - **React Router** - Client-side routing
